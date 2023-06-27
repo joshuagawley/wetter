@@ -16,6 +16,7 @@ pub struct Location {
     pub timezone: String,
 }
 
+// 16851 gets us fields: status,country,countryCode,city,lat,lon,timezone
 pub async fn get_current_location(client: &Client) -> Result<Location, reqwest::Error> {
     let request = client
         .request(Method::GET, IP_API_URL_BASE_PATH)
