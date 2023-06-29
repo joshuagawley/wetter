@@ -11,9 +11,8 @@ pub struct App {
 }
 
 impl App {
-    pub async fn new() -> anyhow::Result<Self> {
+    pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
-        //let location = get_current_location(&client).await?;
         let location = Location {
             status: "".to_string(),
             country: "United Kingdom".to_owned(),
