@@ -11,8 +11,8 @@ pub struct Location {
     pub country: String,
     pub country_code: String,
     pub city: String,
-    pub lat: f64,
-    pub lon: f64,
+    pub lat: String,
+    pub lon: String,
     pub timezone: String,
 }
 
