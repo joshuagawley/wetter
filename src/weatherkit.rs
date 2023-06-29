@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
-
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
+
+pub const WEATHERKIT_API_BASE_URL: &str = "https://weatherkit.apple.com/api/v1";
 
 /// The system of units that the weather data is reported in.
 #[derive(Deserialize, Debug)]
