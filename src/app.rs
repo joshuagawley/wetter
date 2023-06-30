@@ -1,7 +1,9 @@
 use crate::auth::generate_token;
+use crate::cli::Cli;
 use crate::geolocation::Location;
 use crate::weatherkit::{DataSet, Weather, WEATHERKIT_API_BASE_URL};
 use anyhow::Context;
+use clap::Parser;
 use reqwest::{Client, Method};
 use std::borrow::Cow;
 
@@ -12,6 +14,15 @@ pub struct App {
 }
 
 impl App {
+    pub async fn run() -> anyhow::Result<()> {
+        let cli = Cli::parse();
+        let app = Self::new(cli.location).await?;
+        let datasets = app.get_available_datasets().await?;
+        let weather = app.get_weather(&datasets).await?;
+        if datasets.contains(&DataSet::CurrentWeather) {}
+        Ok(())
+    }
+
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
         let location = Location {
