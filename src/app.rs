@@ -3,6 +3,7 @@ use crate::geolocation::Location;
 use crate::weatherkit::{DataSet, Weather, WEATHERKIT_API_BASE_URL};
 use anyhow::Context;
 use reqwest::{Client, Method};
+use std::borrow::Cow;
 
 pub struct App {
     pub client: Client,
@@ -49,12 +50,12 @@ impl App {
     pub async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
         let url = get_weather_url(&self.location);
         let mut queries = Vec::from([
-            ("countryCode", self.location.country_code.clone()),
-            ("timezone", self.location.timezone.clone()),
+            ("countryCode", Cow::from(&self.location.country_code)),
+            ("timezone", Cow::from(&self.location.timezone)),
         ]);
         queries.reserve(datasets.len());
         for dataset in datasets {
-            queries.push(("dataSets", dataset.to_string()));
+            queries.push(("dataSets", Cow::from(dataset.to_string())));
         }
 
         let request = self
