@@ -1,8 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use std::fs::metadata;
-use std::ptr::write;
 
 pub const WEATHERKIT_API_BASE_URL: &str = "https://weatherkit.apple.com/api/v1";
 
