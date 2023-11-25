@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::TimeZone;
 use reqwest::{Client, Method};
 use serde::Deserialize;
 
@@ -11,8 +12,8 @@ pub struct Location {
     pub country: String,
     pub country_code: String,
     pub city: String,
-    pub lat: String,
-    pub lon: String,
+    pub lat: f64,
+    pub lon: f64,
     pub timezone: String,
 }
 
@@ -22,5 +23,6 @@ pub async fn get_current_location(client: &Client) -> Result<Location, reqwest::
         .request(Method::GET, IP_API_URL_BASE_PATH)
         .query(&[("fields", 16851)])
         .build()?;
+
     client.execute(request).await?.json::<Location>().await
 }

@@ -1,6 +1,6 @@
 use crate::auth::generate_token;
 use crate::cli::Cli;
-use crate::geolocation::Location;
+use crate::geolocation::{get_current_location, Location};
 use crate::weatherkit::{DataSet, Weather, WEATHERKIT_API_BASE_URL};
 use anyhow::{anyhow, Context};
 use clap::Parser;
@@ -43,15 +43,16 @@ impl App {
 
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
-        let location = Location {
-            status: "".to_string(),
-            country: "United Kingdom".to_owned(),
-            country_code: "GB".to_owned(),
-            city: "Canterbury".to_owned(),
-            lat: "51.279".to_owned(),
-            lon: "1.0763".to_owned(),
-            timezone: "Europe/London".to_owned(),
-        };
+        let location = get_current_location(&client).await?;
+        // let location = Location {
+        //     status: "".to_string(),
+        //     country: "United Kingdom".to_owned(),
+        //     country_code: "GB".to_owned(),
+        //     city: "Canterbury".to_owned(),
+        //     lat: "51.279".to_owned(),
+        //     lon: "1.0763".to_owned(),
+        //     timezone: "Europe/London".to_owned(),
+        // };
         let auth_token = generate_token()?;
 
         Ok(Self {
@@ -106,22 +107,29 @@ impl App {
 }
 
 fn get_availability_url(location: &Location) -> String {
-    [
-        WEATHERKIT_API_BASE_URL,
-        "availability",
-        &location.lat,
-        &location.lon,
-    ]
-    .join("/")
+    let mut result = String::from(WEATHERKIT_API_BASE_URL);
+
+    result.push('/');
+    result.push_str("availability");
+    result.push('/');
+    result.push_str(&location.lat.to_string());
+    result.push('/');
+    result.push_str(&location.lon.to_string());
+
+    result
 }
 
 fn get_weather_url(location: &Location) -> String {
-    [
-        WEATHERKIT_API_BASE_URL,
-        "weather",
-        "en",
-        &location.lat,
-        &location.lon,
-    ]
-    .join("/")
+    let mut result = String::from(WEATHERKIT_API_BASE_URL);
+
+    result.push('/');
+    result.push_str("weather");
+    result.push('/');
+    result.push_str("en");
+    result.push('/');
+    result.push_str(&location.lat.to_string());
+    result.push('/');
+    result.push_str(&location.lon.to_string());
+
+    result
 }
