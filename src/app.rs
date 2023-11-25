@@ -2,7 +2,7 @@ use crate::auth::generate_token;
 use crate::cli::Cli;
 use crate::geolocation::Location;
 use crate::weatherkit::{DataSet, Weather, WEATHERKIT_API_BASE_URL};
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use clap::Parser;
 use reqwest::{Client, Method};
 use std::borrow::Cow;
@@ -19,7 +19,25 @@ impl App {
         let app = Self::new(cli.location).await?;
         let datasets = app.get_available_datasets().await?;
         let weather = app.get_weather(&datasets).await?;
-        if datasets.contains(&DataSet::CurrentWeather) {}
+        match weather.current_weather {
+            Some(cw) => {
+                println!(
+                    "Current weather at {}, {} as of {}.",
+                    app.location.city,
+                    app.location.country,
+                    cw.as_of.format("%H:%M on %B %e %Y")
+                );
+                println!();
+                println!("{}", cw)
+            }
+            None => {
+                return Err(anyhow!(
+                    "Current weather for location {}, {} was requested but is not available!",
+                    app.location.city,
+                    app.location.country_code
+                ))
+            }
+        }
         Ok(())
     }
 
