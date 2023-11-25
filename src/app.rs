@@ -107,29 +107,15 @@ impl App {
 }
 
 fn get_availability_url(location: &Location) -> String {
-    let mut result = String::from(WEATHERKIT_API_BASE_URL);
-
-    result.push('/');
-    result.push_str("availability");
-    result.push('/');
-    result.push_str(&location.lat.to_string());
-    result.push('/');
-    result.push_str(&location.lon.to_string());
-
-    result
+    format!(
+        "{}/availability/{}/{}",
+        WEATHERKIT_API_BASE_URL, location.lat, location.lon
+    )
 }
 
 fn get_weather_url(location: &Location) -> String {
-    let mut result = String::from(WEATHERKIT_API_BASE_URL);
-
-    result.push('/');
-    result.push_str("weather");
-    result.push('/');
-    result.push_str("en");
-    result.push('/');
-    result.push_str(&location.lat.to_string());
-    result.push('/');
-    result.push_str(&location.lon.to_string());
-
-    result
+    format!(
+        "{}/weather/en/{}/{}",
+        WEATHERKIT_API_BASE_URL, &location.lat, &location.lon
+    )
 }
