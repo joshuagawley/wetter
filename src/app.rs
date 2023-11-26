@@ -1,7 +1,7 @@
 use crate::auth::generate_token;
 use crate::cli::Cli;
-use crate::geolocation::{get_current_location, Location};
-use crate::weatherkit::{DataSet, Weather, WEATHERKIT_API_BASE_URL};
+use crate::geolocation::Location;
+use crate::weatherkit::{DataSet, Weather};
 use anyhow::{anyhow, Context};
 use clap::Parser;
 use reqwest::{Client, Method};
@@ -17,8 +17,14 @@ impl App {
     pub async fn run() -> anyhow::Result<()> {
         let cli = Cli::parse();
         let app = Self::new(cli.location).await?;
-        let datasets = app.get_available_datasets().await?;
-        let weather = app.get_weather(&datasets).await?;
+        let datasets = app
+            .get_available_datasets()
+            .await
+            .context("Could not download datasets.")?;
+        let weather = app
+            .get_weather(&datasets)
+            .await
+            .context("Could not download weather data.")?;
         match weather.current_weather {
             Some(cw) => {
                 println!(
@@ -44,7 +50,7 @@ impl App {
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
         // TODO: Add forward geocoding support (so user can supply their own location data
-        let location = get_current_location(&client).await?;
+        let location = Location::get_current_location(&client).await?;
         let auth_token = generate_token()?;
 
         Ok(Self {
@@ -54,19 +60,22 @@ impl App {
         })
     }
 
-    pub async fn get_available_datasets(&self) -> reqwest::Result<Vec<DataSet>> {
+    pub async fn get_available_datasets(&self) -> anyhow::Result<Vec<DataSet>> {
         let availability_url = self.location.get_availability_url();
         let request = self
             .client
             .request(Method::GET, availability_url)
             .query(&[("country", &self.location.country_code)])
             .bearer_auth(&self.auth_token)
-            .build()?;
-        self.client
+            .build()
+            .context("Failed to build request")?;
+        Ok(self
+            .client
             .execute(request)
-            .await?
-            .json::<Vec<DataSet>>()
             .await
+            .context("Failed to execute request")?
+            .json::<Vec<DataSet>>()
+            .await?)
     }
 
     pub async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
@@ -86,12 +95,13 @@ impl App {
             .query(&queries)
             .bearer_auth(&self.auth_token)
             .build()
-            .context("failed to build request")?;
+            .context("Failed to build request")?;
 
         let weather = self
             .client
             .execute(request)
-            .await?
+            .await
+            .context("Failed to execute request")?
             .json::<Weather>()
             .await?;
         Ok(weather)
