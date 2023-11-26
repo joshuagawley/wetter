@@ -1,5 +1,5 @@
+use crate::weatherkit::WEATHERKIT_API_BASE_URL;
 use anyhow::Result;
-use chrono::TimeZone;
 use reqwest::{Client, Method};
 use serde::Deserialize;
 
@@ -17,12 +17,28 @@ pub struct Location {
     pub timezone: String,
 }
 
-// 16851 gets us fields: status,country,countryCode,city,lat,lon,timezone
-pub async fn get_current_location(client: &Client) -> Result<Location, reqwest::Error> {
-    let request = client
-        .request(Method::GET, IP_API_URL_BASE_PATH)
-        .query(&[("fields", 16851)])
-        .build()?;
+impl Location {
+    // 16851 gets us fields: status,country,countryCode,city,lat,lon,timezone
+    pub async fn get_current_location(client: &Client) -> Result<Self, reqwest::Error> {
+        let request = client
+            .request(Method::GET, IP_API_URL_BASE_PATH)
+            .query(&[("fields", 16851)])
+            .build()?;
 
-    client.execute(request).await?.json::<Location>().await
+        client.execute(request).await?.json::<Location>().await
+    }
+
+    pub fn get_availability_url(&self) -> String {
+        format!(
+            "{}/availability/{}/{}",
+            WEATHERKIT_API_BASE_URL, self.lat, self.lon
+        )
+    }
+
+    pub fn get_weather_url(&self) -> String {
+        format!(
+            "{}/weather/en/{}/{}",
+            WEATHERKIT_API_BASE_URL, self.lat, self.lon
+        )
+    }
 }

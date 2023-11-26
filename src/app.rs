@@ -55,7 +55,7 @@ impl App {
     }
 
     pub async fn get_available_datasets(&self) -> reqwest::Result<Vec<DataSet>> {
-        let availability_url = get_availability_url(&self.location);
+        let availability_url = self.location.get_availability_url();
         let request = self
             .client
             .request(Method::GET, availability_url)
@@ -70,7 +70,7 @@ impl App {
     }
 
     pub async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
-        let url = get_weather_url(&self.location);
+        let weather_url = self.location.get_weather_url();
         let mut queries = Vec::from([
             ("countryCode", Cow::from(&self.location.country_code)),
             ("timezone", Cow::from(&self.location.timezone)),
@@ -82,7 +82,7 @@ impl App {
 
         let request = self
             .client
-            .request(Method::GET, url)
+            .request(Method::GET, weather_url)
             .query(&queries)
             .bearer_auth(&self.auth_token)
             .build()
@@ -96,18 +96,4 @@ impl App {
             .await?;
         Ok(weather)
     }
-}
-
-fn get_availability_url(location: &Location) -> String {
-    format!(
-        "{}/availability/{}/{}",
-        WEATHERKIT_API_BASE_URL, location.lat, location.lon
-    )
-}
-
-fn get_weather_url(location: &Location) -> String {
-    format!(
-        "{}/weather/en/{}/{}",
-        WEATHERKIT_API_BASE_URL, &location.lat, &location.lon
-    )
 }
