@@ -43,16 +43,8 @@ impl App {
 
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
+        // TODO: Add forward geocoding support (so user can supply their own location data
         let location = get_current_location(&client).await?;
-        // let location = Location {
-        //     status: "".to_string(),
-        //     country: "United Kingdom".to_owned(),
-        //     country_code: "GB".to_owned(),
-        //     city: "Canterbury".to_owned(),
-        //     lat: "51.279".to_owned(),
-        //     lon: "1.0763".to_owned(),
-        //     timezone: "Europe/London".to_owned(),
-        // };
         let auth_token = generate_token()?;
 
         Ok(Self {
