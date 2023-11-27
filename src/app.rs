@@ -26,16 +26,7 @@ impl App {
             .await
             .context("Could not download weather data.")?;
         match weather.current_weather {
-            Some(cw) => {
-                println!(
-                    "Current weather at {}, {} as of {}.",
-                    app.location.city,
-                    app.location.country,
-                    cw.as_of.format("%H:%M on %B %e %Y")
-                );
-                println!();
-                println!("{}", cw)
-            }
+            Some(cw) => cw.prepare(&app.location)?.render(),
             None => {
                 return Err(anyhow!(
                     "Current weather for location {}, {} was requested but is not available!",

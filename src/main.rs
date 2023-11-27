@@ -4,6 +4,7 @@ mod app;
 mod auth;
 mod cli;
 mod geolocation;
+mod tui;
 mod weatherkit;
 
 #[tokio::main]
