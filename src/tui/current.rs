@@ -3,8 +3,11 @@ use crate::tui::border::{Border, Edge, Separator};
 use crate::tui::dimension::{Dimensions, MIN_CELL_WIDTH, MIN_WIDTH};
 use crate::tui::weather::WindDirection;
 use crate::weatherkit::CurrentWeather;
+use chrono::{DateTime, Utc};
 use console::style;
 use inflector::Inflector;
+
+const TIME_FORMAT: &str = "%H:%M";
 
 #[derive(Debug)]
 pub struct PreparedCurrent<'a> {
@@ -16,11 +19,18 @@ pub struct PreparedCurrent<'a> {
     dew_point: String,
     wind: String,
     pressure: String,
+    sunrise: String,
+    sunset: String,
     dimensions: Dimensions,
 }
 
 impl CurrentWeather {
-    pub fn prepare(self, location: &Location) -> anyhow::Result<PreparedCurrent<'_>> {
+    pub fn prepare<'a>(
+        self,
+        location: &'a Location,
+        sunrise: &'a DateTime<Utc>,
+        sunset: &'a DateTime<Utc>,
+    ) -> anyhow::Result<PreparedCurrent<'a>> {
         let temperature = format!("{:.1}ºC", self.temperature);
         let apparent_temperature = format!("{:.1}ºC", self.temperature_apparent);
         let humidity = format!("Humidity: {}%", self.humidity * 100.0);
@@ -43,6 +53,10 @@ impl CurrentWeather {
 
         let pressure = format!("{}hPa", self.pressure);
 
+        let sunrise = format!("{}", sunrise.format(TIME_FORMAT));
+
+        let sunset = format!("{}", sunset.format(TIME_FORMAT));
+
         let title_padding = 2 * 2;
         let longest_cell_width = humidity.len();
         let term_width = MIN_WIDTH + title_padding;
@@ -63,6 +77,8 @@ impl CurrentWeather {
             dew_point,
             wind,
             pressure,
+            sunrise,
+            sunset,
             dimensions,
         })
     }
@@ -130,6 +146,16 @@ impl PreparedCurrent<'_> {
             self.pressure,
             Border::Right.fmt(),
             width = term_width - 2 - cell_width,
+        );
+
+        // Sunrise and sunset
+        println!(
+            "{} {: <cell_width$}{: <width$} {}",
+            Border::Left.fmt(),
+            self.sunrise,
+            self.sunset,
+            Border::Left.fmt(),
+            width = term_width - 2 - cell_width
         );
 
         println!("{}", Edge::Bottom.fmt(term_width));
