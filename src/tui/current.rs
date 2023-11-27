@@ -1,30 +1,10 @@
 use crate::geolocation::Location;
 use crate::tui::border::{Border, Edge, Separator};
+use crate::tui::dimension::{Dimensions, MIN_CELL_WIDTH, MIN_WIDTH};
 use crate::tui::weather::WindDirection;
 use crate::weatherkit::CurrentWeather;
 use console::style;
 use inflector::Inflector;
-
-#[derive(Eq, PartialEq, Debug)]
-struct Dimensions {
-    pub term_width: usize,
-    pub cell_width: usize,
-}
-
-impl From<Dimensions> for (usize, usize) {
-    fn from(value: Dimensions) -> Self {
-        (value.term_width, value.cell_width)
-    }
-}
-
-impl Dimensions {
-    fn new(term_width: usize, cell_width: usize) -> Self {
-        Self {
-            term_width,
-            cell_width,
-        }
-    }
-}
 
 #[derive(Debug)]
 pub struct PreparedCurrent<'a> {
@@ -38,9 +18,6 @@ pub struct PreparedCurrent<'a> {
     pressure: String,
     dimensions: Dimensions,
 }
-
-const MIN_WIDTH: usize = 34;
-const MIN_CELL_WIDTH: usize = MIN_WIDTH / 2 - 2;
 
 impl CurrentWeather {
     pub fn prepare(self, location: &Location) -> anyhow::Result<PreparedCurrent<'_>> {
