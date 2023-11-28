@@ -27,7 +27,7 @@ impl App {
             .context("Could not download weather data.")?;
         match weather.current_weather {
             Some(cw) => {
-                if let Some(daily_forecast) = weather.forecast_daily {
+                if let Some(daily_forecast) = &weather.forecast_daily {
                     let todays_forecast = &daily_forecast.days[0];
 
                     if let (Some(sunrise), Some(sunset)) =
@@ -46,6 +46,19 @@ impl App {
             None => {
                 return Err(anyhow!(
                     "Current weather for location {}, {} was requested but is not available!",
+                    app.location.city,
+                    app.location.country_code
+                ))
+            }
+        }
+
+        match weather.forecast_daily {
+            Some(fd) => {
+                fd.prepare().render();
+            }
+            None => {
+                return Err(anyhow!(
+                    "Weekly weather for location {}, {} was requested but is not available!",
                     app.location.city,
                     app.location.country_code
                 ))

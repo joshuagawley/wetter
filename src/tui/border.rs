@@ -63,6 +63,7 @@ impl Edge {
 pub enum Separator {
     Single,
     Blank,
+    Dashed,
 }
 
 impl Separator {
@@ -75,6 +76,7 @@ impl Separator {
                 "",
                 Border::Right.fmt()
             ),
+            Self::Dashed => format!("├{:┈>width$}┤", ""),
         }
     }
 }
