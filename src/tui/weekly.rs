@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use crate::tui::border::{Border, Edge, Separator};
 use crate::tui::dimension::MIN_CELL_WIDTH;
 use crate::weatherkit::{DailyForecast, DayWeatherConditions};

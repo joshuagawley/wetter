@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use crate::weatherkit::WEATHERKIT_API_BASE_URL;
 use anyhow::Result;
 use reqwest::{Client, Method};

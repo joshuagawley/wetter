@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use include_crypt::{include_crypt, EncryptedFile};
 use jsonwebtoken::{crypto, Algorithm, EncodingKey};

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use crate::geolocation::Location;
 use crate::tui::border::{Border, Edge, Separator};
 use crate::tui::dimension::{Dimensions, MIN_CELL_WIDTH, MIN_WIDTH};

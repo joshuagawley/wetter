@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use crate::auth::generate_token;
 use crate::cli::{Cli, Forecast};
 use crate::geolocation::Location;

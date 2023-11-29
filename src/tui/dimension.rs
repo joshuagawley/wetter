@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 pub const MIN_WIDTH: usize = 34;
 pub const MIN_CELL_WIDTH: usize = MIN_WIDTH / 2 - 2;
 
