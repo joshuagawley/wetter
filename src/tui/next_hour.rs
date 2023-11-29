@@ -17,11 +17,10 @@ pub struct PreparedNextHourSummaries {
 
 impl NextHourForecast {
     pub fn prepare(self, location: &Location) -> PreparedNextHourSummaries {
-        let location = format!("{}, {}", location.city, location.country_code);
         let summaries = Vec::new();
         let width = summaries.len();
         PreparedNextHourSummaries {
-            location,
+            location: location.to_string(),
             summaries,
             width,
         }

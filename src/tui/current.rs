@@ -12,8 +12,8 @@ use inflector::Inflector;
 const TIME_FORMAT: &str = "%H:%M";
 
 #[derive(Debug)]
-pub struct PreparedCurrent<'a> {
-    location: &'a str,
+pub struct PreparedCurrent {
+    location: String,
     condition_code: String,
     temperature: String,
     apparent_temperature: String,
@@ -27,12 +27,12 @@ pub struct PreparedCurrent<'a> {
 }
 
 impl CurrentWeather {
-    pub fn prepare<'a>(
+    pub fn prepare(
         self,
-        location: &'a Location,
-        sunrise: &'a DateTime<Utc>,
-        sunset: &'a DateTime<Utc>,
-    ) -> anyhow::Result<PreparedCurrent<'a>> {
+        location: &Location,
+        sunrise: &DateTime<Utc>,
+        sunset: &DateTime<Utc>,
+    ) -> anyhow::Result<PreparedCurrent> {
         let temperature = format!("{:.1}ºC", self.temperature);
         let apparent_temperature = format!("{:.1}ºC", self.temperature_apparent);
         let humidity = format!("Humidity: {}%", self.humidity * 100.0);
@@ -71,7 +71,7 @@ impl CurrentWeather {
         let dimensions = Dimensions::new(term_width, cell_width);
 
         Ok(PreparedCurrent {
-            location: &location.city,
+            location: location.to_string(),
             condition_code: self.condition_code.to_title_case(),
             temperature,
             apparent_temperature,
@@ -86,7 +86,7 @@ impl CurrentWeather {
     }
 }
 
-impl PreparedCurrent<'_> {
+impl PreparedCurrent {
     pub fn render(self) {
         let (term_width, cell_width) = self.dimensions.into();
 

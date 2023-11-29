@@ -12,13 +12,12 @@ pub struct PreparedWeatherAlertSummaries {
 
 impl WeatherAlertsCollection {
     pub fn prepare(self, location: &Location) -> PreparedWeatherAlertSummaries {
-        let location = format!("{}, {}", location.city, location.country_code);
         let summaries = Vec::new();
         let details_url = self.details_url.unwrap_or("".to_owned());
         let width = 0;
 
         PreparedWeatherAlertSummaries {
-            location,
+            location: location.to_string(),
             summaries,
             details_url,
             width,

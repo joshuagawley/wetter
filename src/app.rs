@@ -62,23 +62,20 @@ impl App {
                         Ok(())
                     } else {
                         Err(anyhow!(
-                        "Current weather for location {}, {} was requested but is not available!",
-                        self.location.city,
-                        self.location.country_code
-                    ))
+                            "Current weather for location {} was requested but is not available!",
+                            self.location
+                        ))
                     }
                 } else {
                     Err(anyhow!(
-                        "Current weather for location {}, {} was requested but is not available!",
-                        self.location.city,
-                        self.location.country_code
+                        "Current weather for location {} was requested but is not available!",
+                        self.location
                     ))
                 }
             }
             None => Err(anyhow!(
-                "Current weather for location {}, {} was requested but is not available!",
-                self.location.city,
-                self.location.country_code
+                "Current weather for location {} was requested but is not available!",
+                self.location
             )),
         }
     }
@@ -90,9 +87,8 @@ impl App {
                 Ok(())
             }
             None => Err(anyhow!(
-                "Weekly weather for location {}, {} was requested but is not available!",
-                self.location.city,
-                self.location.country_code
+                "Weekly weather for location {} was requested but is not available!",
+                self.location
             )),
         }
     }
@@ -104,9 +100,8 @@ impl App {
                 Ok(())
             }
             None => Err(anyhow!(
-                "Hourly weather for location {}, {} was requested but is not available!",
-                self.location.city,
-                self.location.country_code
+                "Hourly weather for location {} was requested but is not available!",
+                self.location
             )),
         }
     }
@@ -118,9 +113,8 @@ impl App {
                 Ok(())
             }
             None => Err(anyhow!(
-                "Next hour weather for location {}, {} was requested but is not available!",
-                self.location.city,
-                self.location.country_code
+                "Next hour weather for location {} was requested but is not available!",
+                self.location
             )),
         }
     }
@@ -128,10 +122,7 @@ impl App {
     fn handle_alerts(&self, weather: Weather) -> anyhow::Result<()> {
         match weather.weather_alerts {
             Some(alerts) => alerts.prepare(&self.location).render(),
-            None => println!(
-                "No weather alerts at {}, {}",
-                self.location.city, self.location.country_code
-            ),
+            None => println!("No weather alerts at {}", self.location),
         }
 
         Ok(())

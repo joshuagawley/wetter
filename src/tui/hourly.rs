@@ -3,8 +3,8 @@ use crate::weatherkit::HourlyForecast;
 
 struct PreparedHourlySummary {}
 
-pub struct PreparedHourlySummeries<'a> {
-    location: &'a str,
+pub struct PreparedHourlySummeries {
+    location: String,
     summaries: Vec<PreparedHourlySummary>,
     width: usize,
 }
@@ -13,13 +13,13 @@ impl HourlyForecast {
     pub fn prepare(self, location: &Location) -> PreparedHourlySummeries {
         let summaries = Vec::new();
         PreparedHourlySummeries {
-            location: &location.city,
+            location: location.to_string(),
             summaries,
             width: 0,
         }
     }
 }
 
-impl PreparedHourlySummeries<'_> {
+impl PreparedHourlySummeries {
     pub fn render(self) {}
 }

@@ -4,6 +4,7 @@ use crate::weatherkit::WEATHERKIT_API_BASE_URL;
 use anyhow::Result;
 use reqwest::{Client, Method};
 use serde::Deserialize;
+use std::fmt::{Display, Formatter};
 
 const IP_API_URL_BASE_PATH: &str = "http://ip-api.com/json/";
 
@@ -42,5 +43,11 @@ impl Location {
             "{}/weather/en/{}/{}",
             WEATHERKIT_API_BASE_URL, self.lat, self.lon
         )
+    }
+}
+
+impl Display for Location {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}, {}", self.country, self.country_code)
     }
 }
