@@ -34,7 +34,6 @@ impl App {
 
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
-        // TODO: Add forward geocoding support (so user can supply their own location data
         let location = Location::get_current_location(&client).await?;
         let auth_token = generate_token()?;
 

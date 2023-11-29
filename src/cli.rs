@@ -11,10 +11,7 @@ pub enum Forecast {
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
-    /// Location to use, if none, defaults to using user's IP to determine current location
-    #[arg(short, long)]
-    pub(crate) location: Option<String>,
-
+    /// The forecast to display
     #[arg(short, long, value_enum, default_value_t = Forecast::Current)]
     pub forecast: Forecast,
 }
