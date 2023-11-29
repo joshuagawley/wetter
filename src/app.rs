@@ -1,5 +1,5 @@
 use crate::auth::generate_token;
-use crate::cli::Cli;
+use crate::cli::{Cli, Forecast};
 use crate::geolocation::Location;
 use crate::weatherkit::{DataSet, Weather};
 use anyhow::{anyhow, Context};
@@ -25,46 +25,11 @@ impl App {
             .get_weather(&datasets)
             .await
             .context("Could not download weather data.")?;
-        match weather.current_weather {
-            Some(cw) => {
-                if let Some(daily_forecast) = &weather.forecast_daily {
-                    let todays_forecast = &daily_forecast.days[0];
 
-                    if let (Some(sunrise), Some(sunset)) =
-                        (todays_forecast.sunrise, todays_forecast.sunset)
-                    {
-                        cw.prepare(&app.location, &sunrise, &sunset)?.render();
-                    }
-                } else {
-                    return Err(anyhow!(
-                        "Current weather for location {}, {} was requested but is not available!",
-                        app.location.city,
-                        app.location.country_code
-                    ));
-                }
-            }
-            None => {
-                return Err(anyhow!(
-                    "Current weather for location {}, {} was requested but is not available!",
-                    app.location.city,
-                    app.location.country_code
-                ))
-            }
+        match cli.forecast {
+            Forecast::Current => app.handle_current_forecast(weather),
+            Forecast::Weekly => app.handle_weekly_forecast(weather),
         }
-
-        match weather.forecast_daily {
-            Some(fd) => {
-                fd.prepare().render();
-            }
-            None => {
-                return Err(anyhow!(
-                    "Weekly weather for location {}, {} was requested but is not available!",
-                    app.location.city,
-                    app.location.country_code
-                ))
-            }
-        }
-        Ok(())
     }
 
     pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
@@ -78,6 +43,54 @@ impl App {
             location,
             auth_token,
         })
+    }
+
+    fn handle_current_forecast(&self, weather: Weather) -> anyhow::Result<()> {
+        match weather.current_weather {
+            Some(cw) => {
+                if let Some(daily_forecast) = &weather.forecast_daily {
+                    let todays_forecast = &daily_forecast.days[0];
+
+                    if let (Some(sunrise), Some(sunset)) =
+                        (todays_forecast.sunrise, todays_forecast.sunset)
+                    {
+                        cw.prepare(&self.location, &sunrise, &sunset)?.render();
+                        Ok(())
+                    } else {
+                        Err(anyhow!(
+                        "Current weather for location {}, {} was requested but is not available!",
+                        self.location.city,
+                        self.location.country_code
+                    ))
+                    }
+                } else {
+                    Err(anyhow!(
+                        "Current weather for location {}, {} was requested but is not available!",
+                        self.location.city,
+                        self.location.country_code
+                    ))
+                }
+            }
+            None => Err(anyhow!(
+                "Current weather for location {}, {} was requested but is not available!",
+                self.location.city,
+                self.location.country_code
+            )),
+        }
+    }
+
+    fn handle_weekly_forecast(&self, weather: Weather) -> anyhow::Result<()> {
+        match weather.forecast_daily {
+            Some(fd) => {
+                fd.prepare().render();
+                Ok(())
+            }
+            None => Err(anyhow!(
+                "Weekly weather for location {}, {} was requested but is not available!",
+                self.location.city,
+                self.location.country_code
+            )),
+        }
     }
 
     pub async fn get_available_datasets(&self) -> anyhow::Result<Vec<DataSet>> {
