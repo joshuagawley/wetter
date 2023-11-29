@@ -15,23 +15,23 @@ pub enum WindDirection {
 
 impl WindDirection {
     pub fn get_direction(wind_direction: u16) -> anyhow::Result<Self> {
-        let direction = match wind_direction % 360 {
-            (337..=360) | (0..=22) => Self::North,
-            (22..=67) => Self::NorthEast,
-            (67..=112) => Self::East,
-            (112..=157) => Self::SouthEast,
-            (157..=202) => Self::South,
-            (202..=247) => Self::SouthWest,
-            (247..=292) => Self::West,
-            (292..=337) => Self::NorthWest,
-            _ => {
-                return Err(anyhow!(
-                    "Couldn't parse wind direction (this should never happen???)"
-                ))
+        match wind_direction % 360 {
+            wind_direction
+                if (337..=360).contains(&wind_direction) || (0..22).contains(&wind_direction) =>
+            {
+                Ok(Self::North)
             }
-        };
-
-        Ok(direction)
+            wind_direction if (22..67).contains(&wind_direction) => Ok(Self::NorthEast),
+            wind_direction if (67..112).contains(&wind_direction) => Ok(Self::East),
+            wind_direction if (112..157).contains(&wind_direction) => Ok(Self::SouthEast),
+            wind_direction if (157..202).contains(&wind_direction) => Ok(Self::South),
+            wind_direction if (202..247).contains(&wind_direction) => Ok(Self::SouthWest),
+            wind_direction if (247..292).contains(&wind_direction) => Ok(Self::West),
+            wind_direction if (292..337).contains(&wind_direction) => Ok(Self::NorthWest),
+            _ => Err(anyhow!(
+                "Couldn't parse wind direction (this should never happen???)"
+            )),
+        }
     }
 
     pub const fn get_icon(&self) -> char {
