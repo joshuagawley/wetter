@@ -16,7 +16,7 @@ pub struct App {
 impl App {
     pub async fn run() -> anyhow::Result<()> {
         let cli = Cli::parse();
-        let app = Self::new(cli.location).await?;
+        let app = Self::new().await?;
         let datasets = app
             .get_available_datasets()
             .await
@@ -32,7 +32,7 @@ impl App {
         }
     }
 
-    pub async fn new(location_str: Option<String>) -> anyhow::Result<Self> {
+    pub async fn new() -> anyhow::Result<Self> {
         let client = Client::builder().build()?;
         let location = Location::get_current_location(&client).await?;
         let auth_token = generate_token()?;
