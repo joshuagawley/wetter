@@ -1,6 +1,7 @@
 use crate::tui::border::{Border, Edge, Separator};
 use crate::tui::dimension::MIN_CELL_WIDTH;
 use crate::weatherkit::{DailyForecast, DayWeatherConditions};
+use anyhow::anyhow;
 use inflector::Inflector;
 use std::cmp;
 
@@ -32,16 +33,18 @@ impl DayWeatherConditions {
 }
 
 impl DailyForecast {
-    pub fn prepare(self) -> PreparedDailySummaries {
+    pub fn prepare(self) -> anyhow::Result<PreparedDailySummaries> {
         let summaries = self.days.iter().map(|x| x.prepare()).collect::<Vec<_>>();
         let width = summaries
             .iter()
             .map(|x| x.condition_code.len() + x.temperature.len() + x.condition_code.len())
             .max()
-            .unwrap()
+            .ok_or_else(|| {
+                anyhow!("Internal error: could not get maximum of prepared daily summaries.")
+            })?
             + 10;
 
-        PreparedDailySummaries { summaries, width }
+        Ok(PreparedDailySummaries { summaries, width })
     }
 }
 

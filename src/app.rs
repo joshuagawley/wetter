@@ -8,9 +8,9 @@ use reqwest::{Client, Method};
 use std::borrow::Cow;
 
 pub struct App {
-    pub client: Client,
-    pub location: Location,
-    pub auth_token: String,
+    client: Client,
+    location: Location,
+    auth_token: String,
 }
 
 impl App {
@@ -82,7 +82,7 @@ impl App {
     fn handle_weekly_forecast(&self, weather: Weather) -> anyhow::Result<()> {
         match weather.forecast_daily {
             Some(fd) => {
-                fd.prepare().render();
+                fd.prepare()?.render();
                 Ok(())
             }
             None => Err(anyhow!(
@@ -92,8 +92,7 @@ impl App {
             )),
         }
     }
-
-    pub async fn get_available_datasets(&self) -> anyhow::Result<Vec<DataSet>> {
+    async fn get_available_datasets(&self) -> anyhow::Result<Vec<DataSet>> {
         let availability_url = self.location.get_availability_url();
         let request = self
             .client
@@ -111,7 +110,7 @@ impl App {
             .await?)
     }
 
-    pub async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
+    async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
         let weather_url = self.location.get_weather_url();
         let mut queries = Vec::from([
             ("countryCode", Cow::from(&self.location.country_code)),
