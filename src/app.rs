@@ -157,14 +157,12 @@ impl App {
 
     async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
         let weather_url = self.location.get_weather_url();
-        let mut queries = Vec::from([
+        let mut queries = vec![
             ("countryCode", Cow::from(&self.location.country_code)),
             ("timezone", Cow::from(&self.location.timezone)),
-        ]);
+        ];
         queries.reserve(datasets.len());
-        for dataset in datasets {
-            queries.push(("dataSets", Cow::from(dataset.to_string())));
-        }
+        queries.extend(datasets.iter().map(|x| ("dataSets", x.to_string().into())));
 
         let request = self
             .client
