@@ -8,6 +8,12 @@ pub enum Forecast {
     Current,
     /// Get the 10-day forecast
     Weekly,
+    /// Get the hourly forecast
+    Hourly,
+    /// Get the forecast for the next hour
+    NextHour,
+    /// Get any alerts
+    Alerts,
 }
 
 #[derive(Parser, Debug)]

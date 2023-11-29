@@ -31,6 +31,9 @@ impl App {
         match cli.forecast {
             Forecast::Current => app.handle_current_forecast(weather),
             Forecast::Weekly => app.handle_weekly_forecast(weather),
+            Forecast::Hourly => app.handle_hourly_forecast(weather),
+            Forecast::NextHour => app.handle_next_hour(weather),
+            Forecast::Alerts => app.handle_alerts(weather),
         }
     }
 
@@ -93,6 +96,47 @@ impl App {
             )),
         }
     }
+
+    fn handle_hourly_forecast(&self, weather: Weather) -> anyhow::Result<()> {
+        match weather.forecast_hourly {
+            Some(fh) => {
+                fh.prepare(&self.location).render();
+                Ok(())
+            }
+            None => Err(anyhow!(
+                "Hourly weather for location {}, {} was requested but is not available!",
+                self.location.city,
+                self.location.country_code
+            )),
+        }
+    }
+
+    fn handle_next_hour(&self, weather: Weather) -> anyhow::Result<()> {
+        match weather.forecast_next_hour {
+            Some(fnh) => {
+                fnh.prepare(&self.location).render();
+                Ok(())
+            }
+            None => Err(anyhow!(
+                "Next hour weather for location {}, {} was requested but is not available!",
+                self.location.city,
+                self.location.country_code
+            )),
+        }
+    }
+
+    fn handle_alerts(&self, weather: Weather) -> anyhow::Result<()> {
+        match weather.weather_alerts {
+            Some(alerts) => alerts.prepare(&self.location).render(),
+            None => println!(
+                "No weather alerts at {}, {}",
+                self.location.city, self.location.country_code
+            ),
+        }
+
+        Ok(())
+    }
+
     async fn get_available_datasets(&self) -> anyhow::Result<Vec<DataSet>> {
         let availability_url = self.location.get_availability_url();
         let request = self
