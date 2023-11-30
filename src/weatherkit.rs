@@ -2,7 +2,6 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 
 pub const WEATHERKIT_API_BASE_URL: &str = "https://weatherkit.apple.com/api/v1";
 
@@ -55,16 +54,6 @@ pub enum PressureTrend {
     Falling,
     /// The sea level air pressure is remaining about the same..
     Steady,
-}
-
-impl Display for PressureTrend {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PressureTrend::Rising => write!(f, "rising"),
-            PressureTrend::Falling => write!(f, "falling"),
-            PressureTrend::Steady => write!(f, "steady"),
-        }
-    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -494,14 +483,14 @@ pub enum DataSet {
     WeatherAlerts,
 }
 
-impl Display for DataSet {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl DataSet {
+    pub const fn fmt(&self) -> &str {
         match self {
-            DataSet::CurrentWeather => write!(f, "currentWeather"),
-            DataSet::ForecastDaily => write!(f, "forecastDaily"),
-            DataSet::ForecastHourly => write!(f, "forecastHourly"),
-            DataSet::ForecastNextHour => write!(f, "forecastNextHour"),
-            DataSet::WeatherAlerts => write!(f, "weatherAlerts"),
+            DataSet::CurrentWeather => "currentWeather",
+            DataSet::ForecastDaily => "forecastDaily",
+            DataSet::ForecastHourly => "forecastHourly",
+            DataSet::ForecastNextHour => "forecastNextHour",
+            DataSet::WeatherAlerts => "weatherAlerts",
         }
     }
 }
