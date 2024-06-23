@@ -7,6 +7,19 @@ use crate::weatherkit::{DataSet, Weather};
 use anyhow::{anyhow, Context};
 use clap::Parser;
 use reqwest::{Client, Method};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum WeatherkitRequestError {
+    #[error("The server is unable to process the request due to an invalid parameter value.")]
+    BadRequest,
+    #[error(
+        "The request isn’t authorized or doesn’t include the correct authentication information."
+    )]
+    Unauthorized,
+    #[error("There’s no active alert for the specified unique identifier.")]
+    NotFound,
+}
 
 pub struct App {
     client: Client,
@@ -136,16 +149,22 @@ impl App {
             .bearer_auth(&self.auth_token)
             .build()
             .context("Failed to build request")?;
-        Ok(self
+
+        let response = self
             .client
             .execute(request)
             .await
-            .context("Failed to execute request")?
-            .json::<Vec<DataSet>>()
-            .await?)
+            .context("Failed to execute request")?;
+
+        match response.status().as_u16() {
+            200 => Ok(response.json::<Vec<DataSet>>().await?),
+            400 => Err(WeatherkitRequestError::BadRequest.into()),
+            401 => Err(WeatherkitRequestError::Unauthorized.into()),
+            _ => unreachable!(),
+        }
     }
 
-    async fn get_weather(&self, datasets: &Vec<DataSet>) -> anyhow::Result<Weather> {
+    async fn get_weather(&self, datasets: &[DataSet]) -> anyhow::Result<Weather> {
         let weather_url = self.location.get_weather_url();
         let mut queries = Vec::from([
             ("countryCode", self.location.country_code.as_str()),
@@ -162,13 +181,17 @@ impl App {
             .build()
             .context("Failed to build request")?;
 
-        let weather = self
+        let response = self
             .client
             .execute(request)
             .await
-            .context("Failed to execute request")?
-            .json::<Weather>()
-            .await?;
-        Ok(weather)
+            .context("Failed to execute request")?;
+
+        match response.status().as_u16() {
+            200 => Ok(response.json::<Weather>().await?),
+            400 => Err(WeatherkitRequestError::BadRequest.into()),
+            401 => Err(WeatherkitRequestError::Unauthorized.into()),
+            _ => unreachable!(),
+        }
     }
 }
